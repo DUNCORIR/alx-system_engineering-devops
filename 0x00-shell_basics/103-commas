@@ -1,1 +1,2 @@
+#!/bin/bash
 ls -p -a1 | sed 's/\(.*\)/\1\//' | LC_ALL=C sort -d -f -t '/' -k 2 | tr '\n' ',' | sed 's/,$/\n/'
