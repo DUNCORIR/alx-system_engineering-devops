@@ -1,2 +1,2 @@
 #!/bin/bash
-ls -p -a1 | sed 's/\(.*\)/\1\//' | LC_ALL=C sort -d -f -t '/' -k 2 | tr '\n' ',' | sed 's/,$/\n/'
+ls -a1 | awk 'BEGIN{ORS=", "} {if($0==".") print "./"; else if($0=="..") print "../"; else {gsub(/ /,"\\ "); if ($0 ~ /^\.|[^/]$/) {print $0} else {print $0 "/"}}}' | sed 's/, $/\n/' | sort -f | awk 'BEGIN{ORS=", "} {print}' | sed 's/, $/\
