@@ -1,2 +1,2 @@
 #!/bin/bash
-find . -type f -name '*.gif' -print0 | xargs -0 -n1 sh -c 'echo "${0%.*}"' | LC_ALL=C sort -f
+find . -type f -name '*.gif' -print0 | xargs -0 -I{} sh -c 'basename "{}" .gif' | LC_ALL=C sort -f
