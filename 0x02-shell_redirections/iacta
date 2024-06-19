@@ -1,0 +1,11 @@
+Quantum computers?
+When scientists and engineers encounter difficult problems, they turn to supercomputers. These are very large classical computers, often with thousands of classical CPU and GPU cores capable of running very large calculations and advanced artificial intelligence. However, even supercomputers are binary code-based machines reliant on 20th-century transistor technology. They struggle to solve certain kinds of problems.
+
+If a supercomputer gets stumped, that's probably because the big classical machine was asked to solve a problem with a high degree of complexity. When classical computers fail, it's often due to complexity.
+
+Complex problems are problems with lots of variables interacting in complicated ways. Modeling the behavior of individual atoms in a molecule is a complex problem, because of all the different electrons interacting with one another. Identifying subtle patterns of fraud in financial transactions or new physics in a supercollider are also complex problems. There are some complex problems that we do not know how to solve with classical computers at any scale.
+
+The real world runs on quantum physics. Computers that make calculations by using the quantum states of quantum bits should in many situations be our best tools for understanding it.
+
+
+
