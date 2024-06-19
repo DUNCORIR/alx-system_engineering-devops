@@ -1,2 +1,2 @@
-#!/bin/bash
-cat quote | tr 'N-ZA-Mn-za-m' 'A-Za-z'
+#!/usr/bin/bash
+tr 'A-Za-z' 'N-ZA-Mn-za-m'
