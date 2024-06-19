@@ -1,2 +1,2 @@
 #!/bin/bash
-
+echo $(printf "%x" $((16#$(echo $WATER | tr -d 'a-z' | tr 'A-Z' 'a-z') + 16#$(echo $STIR | tr -d 'a-z' | tr 'A-Z' 'a-z'))))
