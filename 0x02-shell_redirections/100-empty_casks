@@ -1,2 +1,2 @@
 #!/bin/bash
-find . -empty -exec basename {} \;
+find . -type d -empty -exec sh -c 'for dir; do echo "${dir##*/}"; done' sh {} + -o -type f -empty -exec sh -c 'for file; do echo "${file##*/}"; done' sh {} +; echo
