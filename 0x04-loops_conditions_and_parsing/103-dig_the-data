@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# this bash script groups visitors by IP and
+# HTTP status code, and displays this data.
+
+awk '{count[$1,$9]++} END {for (ip_http in count) {print count[ip_http], ip_http}}' apache-access.log | sort -nr
