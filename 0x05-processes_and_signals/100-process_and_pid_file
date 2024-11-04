@@ -13,7 +13,7 @@ trap 'echo "I hate the kill command"' SIGTERM
 # Handle SIGINT signal
 trap 'echo "Y U no love me?!"; exit' SIGINT
 # Handle SIGQUIT and SIGTERM signals to delete PID file and exit
-trap 'rm -f /var/run/myscript.pid; echo "Exiting..."; exit' SIGQUIT SIGTERM
+trap 'rm -f /var/run/myscript.pid; echo "I hate the kill command"; exit' SIGQUIT SIGTERM
 
 # Display message indefinately
 while true
