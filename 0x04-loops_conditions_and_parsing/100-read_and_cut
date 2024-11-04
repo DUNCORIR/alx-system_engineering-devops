@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# This Bash script that displays the content of the file /etc/passwd.
+
+# Set the Internal Field Separator to colon
+IFS=":"
+
+# using while loop to read /etc/passwd line by line
+while read -r username _user_id _ _ home_dir _; do
+	echo "$username:$user_id:$home_dir"
+done < /etc/passwd
