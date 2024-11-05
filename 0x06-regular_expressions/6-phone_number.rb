@@ -1,2 +1,7 @@
 #!/usr/bin/env ruby
-puts ARGV[0].scan(/\d{10}/).join
+input = ARGV[0]
+if input.match(/^\d{10}$/)
+  puts input
+else
+  puts "No match found"
+end
