@@ -1,0 +1,11 @@
+#!usr/bin/env bash
+
+# Check commands available
+if command -v ifconfig &> /dev/null; then
+	ifconfig | grep 'inet ' | awk '{print $2}' | grep -v '127.0.0.1'
+elif command -v ip &> /dev/null; then
+	ip addr | grep 'inet ' | awk '{print $2}' | cut -d'/' -f1 | grep -v '127.0.0.1'
+else
+	echo "No active IPv4 IPs command available"
+	exit 1
+fi
