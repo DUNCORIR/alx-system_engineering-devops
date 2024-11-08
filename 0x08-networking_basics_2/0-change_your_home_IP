@@ -13,5 +13,5 @@ sed -i '/127.0.0.2 localhost/d' /etc/hosts
 sed -i '/8.8.8.8 facebook.com/d' /etc/hosts
 
 # Append the new entries
-echo "127.0.0.2 mylocalhost" | sudo tee -a /etc/hosts
+echo "127.0.0.2 localhost" | sudo tee -a /etc/hosts
 echo "8.8.8.8 facebook.com" | tee -a /etc/hosts
