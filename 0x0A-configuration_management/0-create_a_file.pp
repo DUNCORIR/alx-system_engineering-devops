@@ -1,3 +1,5 @@
+# This Puppet manifest creates a file at /tmp/school with specific permissions and content.
+
 file { '/tmp/school':
   ensure  => 'file',
   mode    => '0744',  # File permission
