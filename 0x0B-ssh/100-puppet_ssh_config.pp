@@ -1,15 +1,13 @@
 # This puppet sets up client SSH configuration file so that it connect to a server without typing a password.
-file { '/home/duncorir/.ssh/config':
-  ensure  => file,
-  owner   => 'duncorir',
-  group   => 'duncorir',
-  mode    => '0600',
-  content => template('ssh/config.erb'),
+# 100-puppet_ssh_config.pp
+file_line { 'Turn off passwd auth':
+  path  => '/etc/ssh/ssh_config',
+  line  => 'PasswordAuthentication no',
+  match => '^#PasswordAuthentication',
 }
 
-file { '/home/duncorir/.ssh':
-  ensure => directory,
-  owner  => 'duncorir',
-  group  => 'duncorir',
-  mode   => '0700',
+file_line { 'Declare identity file':
+  path  => '/etc/ssh/ssh_config',
+  line  => 'IdentityFile ~/.ssh/school',
+  match => '^#IdentityFile',
 }
