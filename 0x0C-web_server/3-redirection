@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Script to configure Nginx to serve a 301 redirection from /redirect_me to /redirected.html
+
+# Install Nginx
+sudo apt install nginx -y
+
+# Create a custom HTML page for the redirection target
+echo "You have been redirected!" | sudo tee /var/www/html/redirected.html > /dev/null
+
+# Configure Nginx to redirect /redirect_me to /redirected.html
+sudo sed -i '/server_name _;/a \\n\tlocation /redirect_me {\n\t\treturn 301 /redirected.html;\n\t}' /etc/nginx/sites-available/default
+
+# Restart Nginx without using systemctl
+sudo service nginx restart
