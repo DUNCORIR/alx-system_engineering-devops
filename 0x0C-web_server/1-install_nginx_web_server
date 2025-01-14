@@ -1,0 +1,16 @@
+#!/bin/bash
+# Script to Update package lists and install Nginx
+sudo apt update -y
+sudo apt install nginx -y
+
+# Create a custom HTML page containing "Hello World!"
+echo "Hello World!" | sudo tee /var/www/html/index.html
+
+# Ensure Nginx is listening on port 80
+sudo sed -i 's/listen 80 default_server;/listen 80;/' /etc/nginx/sites-available/default
+
+# Test Nginx configuration for syntax errors
+sudo nginx -t
+
+# Restart Nginx without using systemctl
+sudo service nginx restart
