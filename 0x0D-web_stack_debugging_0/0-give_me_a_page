@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Script that gets Apache to run on the container and to return a page containing Hello ALX when querying the root of it.
+
+echo -e "apt update\napt install apache2 -y\nservice apache2 start\necho 'Hello ALX' > /var/www/html/index.html\nservice apache2 restart" > 0-give_me_a_page
