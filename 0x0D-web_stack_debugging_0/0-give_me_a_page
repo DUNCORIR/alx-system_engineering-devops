@@ -1,34 +1,5 @@
 #!/usr/bin/env bash
-# Start the Docker container
-docker run -p 8080:80 -d -it alx/265-0
-
-# List running containers
-docker ps
-
-# Access the running container
-docker exec -it <container_id> /bin/bash
-
-# Update package lists and install Apache
-apt update
-apt install apache2 -y
-
-# Start the Apache service
-service apache2 start
-
-# Create the Hello ALX webpage
+# commands to fix issue and display  "Hello ALX":
+docker exec -it youthful_merkle /bin/bash
 echo "Hello ALX" > /var/www/html/index.html
-
-# Verify Apache configuration
-cat /etc/apache2/sites-available/000-default.conf
-
-# nano /etc/apache2/sites-available/000-default.conf
-# Ensure DocumentRoot is set to /var/www/html
-
-# Restart Apache to apply changes
-service apache2 restart
-
-# Test Apache inside the container
-curl localhost
-
-# Test Apache from the host machine
-curl 0:8080
+apachectl restart
