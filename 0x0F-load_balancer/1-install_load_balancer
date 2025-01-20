@@ -7,16 +7,16 @@ sudo apt install -y haproxy
 
 # Set the correct hostnames for the web servers if needed
 # Here we assume STUDENT_ID is the identifier for the hostname pattern
-STUDENT_ID="your_student_id_here"
-sudo hostnamectl set-hostname "${STUDENT_ID}-lb-01"
+648211="your_student_id_here"
+sudo hostnamectl set-hostname "${648211}-lb-01"
 
 # Check if hostnames for web-01 and web-02 are correct
-ssh web-01 "sudo hostnamectl set-hostname ${STUDENT_ID}-web-01"
-ssh web-02 "sudo hostnamectl set-hostname ${STUDENT_ID}-web-02"
+ssh web-01 "sudo hostnamectl set-hostname ${648211}-web-01"
+ssh web-02 "sudo hostnamectl set-hostname ${648211}-web-02"
 
 # Ensure the web servers are reachable from lb-01
-ping -c 1 ${STUDENT_ID}-web-01
-ping -c 1 ${STUDENT_ID}-web-02
+ping -c 1 ${648211}-web-01
+ping -c 1 ${648211}-web-02
 
 # Configure HAProxy with round-robin load balancing
 sudo bash -c 'cat > /etc/haproxy/haproxy.cfg << EOF
