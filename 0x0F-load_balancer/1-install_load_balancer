@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# This script installs and configures HAProxy on the lb-01 server to load balance between web-01 and web-02.
+
+# Update the package list and install HAProxy
+sudo apt update -y
+sudo apt install -y haproxy
+
+# Set the correct hostnames for the web servers if needed
+# Here we assume STUDENT_ID is the identifier for the hostname pattern
+STUDENT_ID="your_student_id_here"
+sudo hostnamectl set-hostname "${STUDENT_ID}-lb-01"
+
+# Check if hostnames for web-01 and web-02 are correct
+ssh web-01 "sudo hostnamectl set-hostname ${STUDENT_ID}-web-01"
+ssh web-02 "sudo hostnamectl set-hostname ${STUDENT_ID}-web-02"
+
+# Ensure the web servers are reachable from lb-01
+ping -c 1 ${STUDENT_ID}-web-01
+ping -c 1 ${STUDENT_ID}-web-02
+
+# Configure HAProxy with round-robin load balancing
+sudo bash -c 'cat > /etc/haproxy/haproxy.cfg << EOF
+# Global settings
+global
+    log /dev/log   local0
+    maxconn 200
+
+# Default settings
+defaults
+    log     global
+    option  httplog
+    timeout connect 5000ms
+    timeout client  50000ms
+    timeout server  50000ms
+
+# Frontend definition
+frontend http_front
+    bind *:80
+    default_backend http_back
+
+# Backend definition with round-robin load balancing
+backend http_back
+    balance roundrobin
+    server web-01 ${STUDENT_ID}-web-01:80 check
+    server web-02 ${STUDENT_ID}-web-02:80 check
+EOF'
+
+# Restart HAProxy to apply changes
+sudo systemctl restart haproxy
+sudo systemctl enable haproxy
+
+# Print HAProxy status to verify the installation
+sudo systemctl status haproxy
