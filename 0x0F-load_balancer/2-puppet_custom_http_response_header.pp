@@ -1,43 +1,31 @@
-# Ensure the system's package list is updated before installing Nginx
-exec { 'apt-update':
-  command => '/usr/bin/apt update -y',  # Command to refresh package lists
-  path    => ['/usr/bin', '/usr/sbin'], # Ensures the command is found in these paths
-  unless  => '/usr/bin/test -f /var/lib/apt/periodic/update-success-stamp', 
-  # Only run the command if the update success file does not exist
-  before  => Package['nginx'],          # Run this command before installing Nginx
-}
+# This Puppet manifest configures Nginx with a custom HTTP response header "X-Served-By".
 
-# Ensure the Nginx package is installed
-package { 'nginx':
-  ensure => installed, # Installs Nginx if not already installed
-}
+node default {
+  # Ensure Nginx is installed
+  package { 'nginx':
+    ensure => installed,
+  }
 
-# Create or update the custom Nginx configuration file
-file { '/etc/nginx/conf.d/custom_header.conf':
-  ensure  => file,      # Ensures the file exists
-  content => @("EOF")   # The contents of the Nginx configuration
-server {
-    listen 80 default_server;       # Listen on port 80 (default HTTP port)
-    listen [::]:80 default_server;  # Listen for IPv6 connections on port 80
+  # Ensure the Nginx service is enabled and running
+  service { 'nginx':
+    ensure     => running,
+    enable     => true,
+    subscribe  => File['/etc/nginx/conf.d/custom_header.conf'], # Restart on config change
+  }
 
-    root /var/www/html;             # Set the root directory for the web server
-    index index.html;               # Use index.html as the default file
+  # Custom Nginx configuration with the header
+  file { '/etc/nginx/conf.d/custom_header.conf':
+    ensure  => file,
+    content => template('nginx/custom_header.erb'),
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+  }
 
-    server_name _;                  # Catch-all server name
-
-    location / {                    # Default location block
-        add_header X-Served-By \$hostname; 
-        # Add a custom HTTP header with the value as the server hostname
-    }
-}
-| EOF
-  notify  => Service['nginx'],      # Notify the Nginx service to restart if this file changes
-}
-
-# Manage the Nginx service
-service { 'nginx':
-  ensure     => running,            # Make sure the service is running
-  enable     => true,               # Ensure the service starts on boot
-  subscribe  => File['/etc/nginx/conf.d/custom_header.conf'], 
-  # Restart the service if the configuration file changes
+  # Ensure the Nginx configuration is reloaded after changes
+  exec { 'reload-nginx':
+    command     => '/usr/sbin/nginx -s reload',
+    refreshonly => true,
+    subscribe   => File['/etc/nginx/conf.d/custom_header.conf'],
+  }
 }
