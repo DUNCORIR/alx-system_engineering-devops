@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Ensure Nginx is running and listening on port 80
 sudo pkill apache2
+sudo service nginx stop
 sudo apt install -y nginx
-sudo systemctl stop apache2
 sudo systemctl status nginx | grep "active (running)" > /dev/null || exit 1
