@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# The script ensures Nginx is running and listening on port 80
+
+# Stop Apache if running
+pgrep apache2 > /dev/null && sudo pkill apache2
+
+# Install Nginx if not installed
+dpkg -l | grep -q nginx || {
+    sudo apt update && sudo apt install -y nginx
+}
+
+# Ensure Nginx is configured to listen on port 80
+sudo sed -i 's/listen 80 default_server;/listen 80 default_server;\n    listen [::]:80 default_server;/' /etc/nginx/sites-available/default
+
+# Restart Nginx to apply changes
+sudo systemctl restart nginx
+
+# Check if Nginx is listening on port 80
+sudo ss -tuln | grep -q ":80" && echo "Nginx is running and listening on port 80." || {
+    echo "Failed to configure Nginx on port 80." && exit 1
+}
