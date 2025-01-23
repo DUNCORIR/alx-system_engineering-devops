@@ -16,6 +16,9 @@ sudo sed -i 's/listen 80 default_server;/listen 80 default_server;\n    listen [
 sudo systemctl restart nginx
 
 # Check if Nginx is listening on port 80
-sudo ss -tuln | grep -q ":80" && echo "Nginx is running and listening on port 80." || {
-    echo "Failed to configure Nginx on port 80." && exit 1
-}
+if sudo ss -tuln | grep -q ":80"; then
+    echo "Nginx is running and listening on port 80."
+else
+    echo "Failed to configure Nginx on port 80."
+    exit 1
+fi
