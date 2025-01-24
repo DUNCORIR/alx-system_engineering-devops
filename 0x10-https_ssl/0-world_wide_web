@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# This script audits subdomains for a given domain.
+# Usage: ./audit_subdomains.sh <domain> [subdomain]
+
+function query_subdomain() {
+    local domain="$1"
+    local subdomain="$2"
+
+    # Query DNS record for the subdomain
+    record=$(dig +short "${subdomain}.${domain}")
+    if [ -z "$record" ]; then
+        echo "The subdomain ${subdomain}.${domain} does not exist or has no A record."
+    else
+        echo "The subdomain ${subdomain}.${domain} is an A record and points to ${record}"
+    fi
+}
+
+# Main script logic
+domain="$1"
+subdomain="$2"
+
+if [ -z "$domain" ]; then
+    echo "Usage: $0 <domain> [subdomain]"
+    exit 1
+fi
+
+if [ -z "$subdomain" ]; then
+    # Default subdomains to query
+    for sub in www lb-01 web-01 web-02; do
+        query_subdomain "$domain" "$sub"
+    done
+else
+    query_subdomain "$domain" "$subdomain"
+fi
