@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
-# This script installs and configures HAProxy as a load balancer for web-01 and web-02.
-# Update and install HAProxy on the load balancer
+# This script installs and configures HAProxy on an Ubuntu machine to load balance traffic between [STUDENT_ID]-web-01 and [STUDENT_ID]-web-02
 
-# Exit on any error
-set -e
+set -e  # Exit immediately if any command fails
 
 # Update package lists
 echo "Updating package lists..."
@@ -21,46 +19,53 @@ sudo apt install -y haproxy
 echo "Enabling HAProxy service to start on boot..."
 sudo systemctl enable haproxy
 
-# Configure HAProxy to load balance between web-01 and web-02
+# Configure HAProxy to load balance between [STUDENT_ID]-web-01 and [STUDENT_ID]-web-02
 echo "Configuring HAProxy..."
-cat <<EOL | sudo tee /etc/haproxy/haproxy.cfg > /dev/null
+sudo tee /etc/haproxy/haproxy.cfg > /dev/null <<EOL
 global
-    log /dev/log    local0
-    maxconn 200
+    log /dev/log local0
+    log /dev/log local1 notice
+    maxconn 2000
+    daemon
 
 defaults
-    log     global
-    option  httplog
+    log global
+    option httplog
     timeout connect 5000ms
-    timeout client  50000ms
-    timeout server  50000ms
+    timeout client 50000ms
+    timeout server 50000ms
 
 frontend http_front
     bind *:80
-    acl url_static path_end .jpg .jpeg .png .gif .css .js
-    use_backend static_files if url_static
     default_backend web_servers
 
 backend web_servers
     balance roundrobin
-    server web-01 100.25.0.82:80 check
-    server web-02 54.87.216.188:80 check
-
-# Enable health checks for web-01 and web-02
-backend static_files
-    balance roundrobin
-    server web-01 100.25.0.82:80 check
-    server web-02 54.87.216.188:80 check
+    http-response set-header X-Served-By %[hostname]
+    server ${STUDENT_ID}-web-01 100.25.0.82:80 check
+    server ${STUDENT_ID}-web-02 54.87.216.188:80 check
 EOL
 
 # Restart HAProxy to apply the new configuration
 echo "Restarting HAProxy..."
 sudo systemctl restart haproxy
 
-# Verify HAProxy status
+# Verify HAProxy status (but don't fail the script)
 echo "Verifying HAProxy service status..."
-sudo systemctl status haproxy
+if ! sudo systemctl status haproxy --no-pager; then
+    echo "Warning: HAProxy service might not be running properly."
+fi
 
-# Show HAProxy stats to ensure it's running properly
-echo "HAProxy is now configured. Checking the load balancer stats..."
-curl -I http://localhost
+# Test if HAProxy is serving requests correctly and print X-Served-By header
+echo "Testing HAProxy load balancing..."
+for i in {1..5}; do
+    SERVED_BY=$(curl -s -I http://localhost | grep "X-Served-By" | awk '{print $2}' | tr -d '\r')
+    if [[ "$SERVED_BY" == "${STUDENT_ID}-web-01" || "$SERVED_BY" == "${STUDENT_ID}-web-02" ]]; then
+        echo "$SERVED_BY"
+        exit 0
+    fi
+    sleep 1
+done
+
+echo "Error: Could not verify that HAProxy is serving ${STUDENT_ID}-web-01 or ${STUDENT_ID}-web-02."
+exit 1
