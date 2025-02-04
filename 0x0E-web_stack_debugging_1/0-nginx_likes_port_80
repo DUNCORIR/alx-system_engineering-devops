@@ -1,10 +1,37 @@
 #!/usr/bin/env bash
 # The script ensures Nginx is running and listening on port 80
 
-# Stop Apache if running
-pgrep apache2 > /dev/null && sudo pkill apache2
+#!/usr/bin/env bash
+# This script installs and configures Nginx to ensure it listens on port 80
 
-sudo apt update && sudo apt install -y nginx
-echo "Hello, World!" | sudo tee /var/www/html/index.html > /dev/null
+set -e  # Exit immediately if any command fails
+
+# Update package lists
+echo "Updating package lists..."
+sudo apt update -y
+
+# Install Nginx if not installed
+echo "Installing Nginx..."
+sudo apt install -y nginx
+
+# Ensure Nginx is enabled and starts on boot
+echo "Enabling and starting Nginx..."
+sudo systemctl enable nginx
+sudo systemctl start nginx
+
+# Verify Nginx configuration syntax
+echo "Checking Nginx configuration..."
+sudo nginx -t
+
+# Restart Nginx to apply changes
+echo "Restarting Nginx..."
 sudo systemctl restart nginx
-curl -s -o /dev/null -w "%{http_code}" http://localhost | grep -q "200" || exit 1
+
+# Confirm Nginx is listening on port 80
+echo "Verifying Nginx is running and listening on port 80..."
+if sudo netstat -tulnp | grep ":80 " | grep "nginx"; then
+    echo "Nginx is successfully running on port 80."
+else
+    echo "Error: Nginx is not listening on port 80."
+    exit 1
+fi
