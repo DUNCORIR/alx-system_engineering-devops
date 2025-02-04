@@ -5,11 +5,15 @@
 sudo apt update
 sudo apt install -y nginx
 
-# Create a custom configuration to include the custom header
-sudo sed -i '/http {/a\    add_header X-Served-By $hostname;' /etc/nginx/nginx.conf
+# Ensure Nginx is enabled and running
+sudo systemctl enable nginx
+sudo systemctl start nginx
 
-# Restart Nginx to apply changes
-sudo systemctl restart nginx
+# Add custom header to Nginx configuration
+NGINX_CONF="/etc/nginx/sites-available/default"
 
-# Check Nginx status to ensure it's running
-sudo systemctl status nginx
+# Use sed to insert the header inside the location block
+sudo sed -i '/location \/ {/a \        add_header X-Served-By "$hostname";' "$NGINX_CONF"
+
+# Test and restart Nginx
+sudo nginx -t && sudo systemctl restart nginx
