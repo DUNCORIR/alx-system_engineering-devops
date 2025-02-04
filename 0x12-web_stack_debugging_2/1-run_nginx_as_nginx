@@ -1,41 +1,18 @@
 #!/usr/bin/env bash
 # This script ensures Nginx runs as the nginx user and listens on port 8080
 
-# Exit on any error
-set -e
+# Ensure nginx user exists
+id -u nginx &>/dev/null || useradd -r nginx
 
-# Ensure Nginx is installed
-echo "Checking if Nginx is installed..."
-if ! command -v nginx &> /dev/null; then
-    echo "Nginx is not installed. Installing..."
-    apt update && apt install -y nginx
-fi
+# Update nginx config to listen on port 8080
+sed -i 's/listen 80;/listen 8080;/g' /etc/nginx/sites-available/default
 
-# Ensure the nginx user exists
-echo "Ensuring nginx user exists..."
-if ! id -u nginx &>/dev/null; then
-    useradd -r -s /bin/false nginx
-fi
+# Change ownership of relevant directories
+chown -R nginx:nginx /var/log/nginx /var/lib/nginx /run/nginx.pid
 
-# Update Nginx config to run as nginx user
-echo "Updating Nginx to run as 'nginx' user..."
-sed -i 's/^user .*/user nginx;/' /etc/nginx/nginx.conf
+# Restart Nginx as nginx user
+pkill -9 nginx  # Kill all Nginx processes
+sudo -u nginx nginx  # Restart Nginx under the nginx user
 
-# Update Nginx to listen on port 8080
-echo "Updating Nginx to listen on port 8080..."
-sed -i 's/listen 80 default_server;/listen 8080 default_server;/' /etc/nginx/sites-available/default
-sed -i 's/listen \[::\]:80 default_server;/listen \[::\]:8080 default_server;/' /etc/nginx/sites-available/default
-
-# Restart Nginx
-echo "Restarting Nginx..."
-systemctl restart nginx
-
-# Verify Nginx is running as nginx user
-echo "Verifying Nginx user..."
-ps aux | grep '[n]ginx'
-
-# Verify Nginx is listening on port 8080
-echo "Verifying Nginx is listening on port 8080..."
-ss -tulnp | grep ':8080'
-
-echo "Nginx is now running as 'nginx' user and listening on port 8080!"
+# Verify Nginx is running as expected
+ps aux | grep '[n]ginx
