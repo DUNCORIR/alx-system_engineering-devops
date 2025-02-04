@@ -15,4 +15,4 @@ pkill -9 nginx  # Kill all Nginx processes
 sudo -u nginx nginx  # Restart Nginx under the nginx user
 
 # Verify Nginx is running as expected
-ps aux | grep '[n]ginx
+pgrep -u nginx nginx
