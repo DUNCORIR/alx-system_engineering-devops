@@ -1,55 +1,66 @@
 #!/usr/bin/env bash
 # This script installs and configures HAProxy as a load balancer for web-01 and web-02.
+# Update and install HAProxy on the load balancer
 
-# Update and install HAProxy
+# Exit on any error
+set -e
+
+# Update package lists
+echo "Updating package lists..."
 sudo apt update -y
+
+# Upgrade packages (optional)
+echo "Upgrading packages..."
+sudo apt upgrade -y
+
+# Install HAProxy
+echo "Installing HAProxy..."
 sudo apt install -y haproxy
 
-# Configure HAProxy
-sudo bash -c 'cat > /etc/haproxy/haproxy.cfg << EOF
-# Global settings
-global
-    log /dev/log local0
-    log /dev/log local1 notice
-    chroot /var/lib/haproxy
-    stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
-    stats timeout 30s
-    user haproxy
-    group haproxy
-    daemon
+# Enable HAProxy to start on boot
+echo "Enabling HAProxy service to start on boot..."
+sudo systemctl enable haproxy
 
-# Default settings
+# Configure HAProxy to load balance between web-01 and web-02
+echo "Configuring HAProxy..."
+cat <<EOL | sudo tee /etc/haproxy/haproxy.cfg > /dev/null
+global
+    log /dev/log    local0
+    maxconn 200
+
 defaults
     log     global
     option  httplog
-    option  dontlognull
     timeout connect 5000ms
     timeout client  50000ms
     timeout server  50000ms
-    errorfile 400 /etc/haproxy/errors/400.http
-    errorfile 403 /etc/haproxy/errors/403.http
-    errorfile 408 /etc/haproxy/errors/408.http
-    errorfile 500 /etc/haproxy/errors/500.http
-    errorfile 502 /etc/haproxy/errors/502.http
-    errorfile 503 /etc/haproxy/errors/503.http
-    errorfile 504 /etc/haproxy/errors/504.http
 
-# Frontend configuration
 frontend http_front
     bind *:80
-    default_backend http_back
+    acl url_static path_end .jpg .jpeg .png .gif .css .js
+    use_backend static_files if url_static
+    default_backend web_servers
 
-# Backend configuration
-backend http_back
+backend web_servers
     balance roundrobin
-    server web-01 34.204.101.142:80 check
-    server web-02 100.25.12.114:80 check
-EOF'
+    server web-01 100.25.0.82:80 check
+    server web-02 54.87.216.188:80 check
 
-# Restart HAProxy to apply configuration
+# Enable health checks for web-01 and web-02
+backend static_files
+    balance roundrobin
+    server web-01 100.25.0.82:80 check
+    server web-02 54.87.216.188:80 check
+EOL
+
+# Restart HAProxy to apply the new configuration
+echo "Restarting HAProxy..."
 sudo systemctl restart haproxy
-sudo systemctl enable haproxy
 
-# Confirm installation and configuration
-haproxy -v
+# Verify HAProxy status
+echo "Verifying HAProxy service status..."
 sudo systemctl status haproxy
+
+# Show HAProxy stats to ensure it's running properly
+echo "HAProxy is now configured. Checking the load balancer stats..."
+curl -I http://localhost
