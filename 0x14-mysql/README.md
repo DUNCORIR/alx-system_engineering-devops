@@ -44,4 +44,4 @@ man mysqldump
 
 Author
 
-Duncan Korir
+Duncan Korir.
