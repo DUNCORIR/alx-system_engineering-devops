@@ -3,8 +3,8 @@
 The script fetches TODO list progress for all employees from a REST API
 and exports the data in JSON format.
 """
-import requests
 import json
+import requests
 
 
 def fetch_all_todos():
@@ -26,21 +26,20 @@ def fetch_all_todos():
         username = user.get("username")
 
         todos_response = requests.get(f"{base_url}/todos?userId={user_id}")
-        if todos_response.status_code != 200:
-            print(f"Error: Unable to fetch todos for user {user_id}")
-            continue
+        if todos_response.status_code == 200:
+            todos = todos_response.json()
+        else:
+            todos = []
 
-        todos = todos_response.json()
-
-        # Structure the data
+        # To ensure all users exist in output, even with no tasks
         all_todos[user_id] = [
             {
                 "username": username,
-                "task": todo.get("title"),
-                "completed": todo.get("completed")
+                "task": todo["title"],
+                "completed": todo["completed"]
             }
             for todo in todos
-        ]
+        ] if todos else []  # Ensure empty list if no tasks
 
     # Save to JSON file
     with open("todo_all_employees.json", "w") as json_file:
