@@ -21,4 +21,7 @@ sed -i 's/listen \[::\]:80 default_server;/listen \[::\]:80;/' /etc/nginx/sites-
 # Restart Nginx to apply changes
 systemctl restart nginx
 
+# Verify Nginx is listening on port 80
+ss -tulnp | grep :80 || exit 1
+
 exit 0
