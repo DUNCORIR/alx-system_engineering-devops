@@ -14,14 +14,35 @@ sudo systemctl enable nginx
 # Allow traffic on port 80 through the firewall
 sudo ufw allow 80/tcp || true
 
-# Ensure Nginx is listening on port 80
-sudo sed -i 's/listen 80 default_server;/listen 80;/' /etc/nginx/sites-available/default
-sudo sed -i 's/listen \[::\]:80 default_server;/listen \[::\]:80;/' /etc/nginx/sites-available/default
+# Restore default Nginx configuration
+echo 'server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    root /var/www/html;
+    index index.html index.htm index.nginx-debian.html;
+
+    server_name _;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}' | sudo tee /etc/nginx/sites-available/default > /dev/nul
+
+# Ensure the default site is enabled
+sudo ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 
 # Restart Nginx to apply changes
 sudo systemctl restart nginx
 
 # Verify Nginx is listening on port 80
-sudo ss -tulnp | grep :80 || exit 1
+if ! sudo ss -tulnp | grep -q ':80'; then
+    exit 1
+fi
+
+# Ensure Nginx responds with HTTP 200
+if ! curl -s -o /dev/null -w "%{http_code}" http://localhost | grep -q "200"; then
+    exit 1
+fi
 
 exit 0
