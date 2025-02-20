@@ -4,24 +4,24 @@
 set -e
 
 # Install Nginx if not installed
-apt-get update -y
-apt-get install -y nginx
+sudo apt-get update -y
+sudo apt-get install -y nginx
 
 # Start Nginx service and enable it on boot
-systemctl start nginx
-systemctl enable nginx
+sudo systemctl start nginx
+sudo systemctl enable nginx
 
 # Allow traffic on port 80 through the firewall
-ufw allow 80/tcp || true
+sudo ufw allow 80/tcp || true
 
 # Ensure Nginx is listening on port 80
-sed -i 's/listen 80 default_server;/listen 80;/' /etc/nginx/sites-available/default
-sed -i 's/listen \[::\]:80 default_server;/listen \[::\]:80;/' /etc/nginx/sites-available/default
+sudo sed -i 's/listen 80 default_server;/listen 80;/' /etc/nginx/sites-available/default
+sudo sed -i 's/listen \[::\]:80 default_server;/listen \[::\]:80;/' /etc/nginx/sites-available/default
 
 # Restart Nginx to apply changes
-systemctl restart nginx
+sudo systemctl restart nginx
 
 # Verify Nginx is listening on port 80
-ss -tulnp | grep :80 || exit 1
+sudo ss -tulnp | grep :80 || exit 1
 
 exit 0
