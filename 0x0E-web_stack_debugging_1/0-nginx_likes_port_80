@@ -15,7 +15,8 @@ sudo systemctl enable nginx
 sudo ufw allow 80/tcp || true
 
 # Restore default Nginx configuration
-echo 'server {
+sudo tee /etc/nginx/sites-available/default > /dev/null <<EOF
+server {
     listen 80 default_server;
     listen [::]:80 default_server;
 
@@ -25,9 +26,10 @@ echo 'server {
     server_name _;
 
     location / {
-        try_files $uri $uri/ =404;
+        try_files \$uri \$uri/ =404;
     }
-}' | sudo tee /etc/nginx/sites-available/default > /dev/nul
+}
+EOF
 
 # Ensure the default site is enabled
 sudo ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
