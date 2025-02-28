@@ -1,20 +1,23 @@
 # Puppet manifest to fix Apache 500 error
 
-file { '/var/www/html/index.html':
-  ensure  => file,
-  content => '<h1>Apache is working!</h1>',
-  owner   => 'www-data',
-  group   => 'www-data',
-  mode    => '0644',
+# Ensure Apache package is installed
+package { 'apache2':
+  ensure => installed,
 }
 
-exec { 'fix-permissions':
-  command => 'chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html',
-  path    => ['/bin', '/usr/bin'],
-}
-
+# Ensure Apache service is running
 service { 'apache2':
   ensure  => running,
   enable  => true,
-  require => [File['/var/www/html/index.html'], Exec['fix-permissions']],
+  require => Package['apache2'],
+}
+
+# Ensure default index.html exists
+file { '/var/www/html/index.html':
+  ensure  => file,
+  content => "Hello, Apache is working!\n",
+  owner   => 'www-data',
+  group   => 'www-data',
+  mode    => '0644',
+  require => Service['apache2'],
 }
