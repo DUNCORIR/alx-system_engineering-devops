@@ -11,6 +11,7 @@ user { 'holberton':
   groups     => ['www-data'],
 }
 
+
 # Ensure the home directory has the correct ownership and permissions
 file { '/home/holberton':
   ensure  => directory,
