@@ -11,19 +11,18 @@ user { 'holberton':
   groups     => ['www-data'],
 }
 
-
 # Ensure the home directory has the correct ownership and permissions
 file { '/home/holberton':
-  ensure  => directory,
-  owner   => 'holberton',
-  group   => 'holberton',
-  mode    => '0750',
+  ensure => directory,
+  owner  => 'holberton',
+  group  => 'holberton',
+  mode   => '0750',
 }
 
 # Example: Ensure 'holberton' has access to a specific directory
 file { '/var/www/html':
-  ensure  => directory,
-  owner   => 'holberton',
-  group   => 'www-data',
-  mode    => '2755',
+  ensure => directory,
+  owner  => 'holberton',
+  group  => 'www-data',
+  mode   => '2755',
 }
