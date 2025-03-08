@@ -2,7 +2,7 @@
 # The scripts Reloads Gunicorn gracefully without downtime
 
 # Get the PID of the Gunicorn master process
-GUNICORN_PID=$(ps aux | grep 'gunicorn' | grep 'master' | awk '{print $2}')
+GUNICORN_PID=$(pgrep -f 'gunicorn.*master')
 
 # Check if the Gunicorn master process is running
 if [ -z "$GUNICORN_PID" ]; then
@@ -12,10 +12,7 @@ fi
 
 # Send the HUP signal to the Gunicorn master process to reload workers
 echo "Reloading Gunicorn workers..."
-kill -HUP "$GUNICORN_PID"
-
-# Check if the reload was successful
-if [ $? -eq 0 ]; then
+if kill -HUP "$GUNICORN_PID"; then
   echo "Gunicorn workers reloaded successfully."
 else
   echo "Failed to reload Gunicorn workers."
