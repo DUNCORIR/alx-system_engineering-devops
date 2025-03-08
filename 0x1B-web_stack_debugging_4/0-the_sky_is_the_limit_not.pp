@@ -42,11 +42,21 @@ file { '/etc/nginx/nginx.conf':
         gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
 
         include /etc/nginx/conf.d/*.conf;
+
+	# Server block
+        server {
+            listen 80;
+            server_name localhost;
+
+            location / {
+                root /var/www/html;
+                index index.html index.htm;
+            }
+        }
     }
     |-EOF
   notify  => Service['nginx'],
 }
-
 # Ensure the Nginx log directory exists
 file { '/var/log/nginx':
   ensure => directory,
