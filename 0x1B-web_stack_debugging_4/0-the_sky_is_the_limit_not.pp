@@ -1,4 +1,4 @@
-# This Puppet manifest configures Nginx for debugging and optimizes performance under high-load conditions.
+# This Puppet manifest configures Nginx for debugging and optimizes performance under high traffic
 
 # Ensure the Nginx package is installed
 package { 'nginx':
@@ -15,15 +15,8 @@ service { 'nginx':
 # Main Nginx configuration file
 file { '/etc/nginx/nginx.conf':
   ensure  => file,
-  content => template('nginx/nginx.conf.erb'),
-  notify  => Service['nginx'],
-}
-
-# Template for the Nginx configuration
-file { '/etc/puppetlabs/code/environments/production/modules/nginx/templates/nginx.conf.erb':
-  ensure  => file,
-  content => @("EOF")
-    user  nginx;
+  content => @(EOF),
+    user  www-data;
     worker_processes auto;
     error_log  /var/log/nginx/error.log debug;
     pid        /var/run/nginx.pid;
@@ -50,14 +43,14 @@ file { '/etc/puppetlabs/code/environments/production/modules/nginx/templates/ngi
 
         include /etc/nginx/conf.d/*.conf;
     }
-  | EOF
+    |-EOF
   notify  => Service['nginx'],
 }
 
 # Ensure the Nginx log directory exists
 file { '/var/log/nginx':
   ensure => directory,
-  owner  => 'nginx',
-  group  => 'nginx',
+  owner  => 'www-data',  # Use www-data instead of nginx
+  group  => 'www-data',  # Use www-data instead of nginx
   mode   => '0755',
 }
