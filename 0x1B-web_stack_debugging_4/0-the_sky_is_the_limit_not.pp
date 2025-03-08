@@ -7,9 +7,9 @@ package { 'nginx':
 
 # Ensure the Nginx service is enabled and running
 service { 'nginx':
-  ensure     => running,
-  enable     => true,
-  subscribe  => File['/etc/nginx/nginx.conf'],
+  ensure    => running,
+  enable    => true,
+  subscribe => File['/etc/nginx/nginx.conf'],
 }
 
 # Main Nginx configuration file
