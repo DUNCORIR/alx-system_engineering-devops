@@ -1,4 +1,10 @@
-# Puppet manifest to fix Apache 500 error
+# Puppet manifest to fix Apache 500 error and ensure no port conflicts
+
+# Ensure conflicting services (e.g., Nginx) are stopped
+service { 'nginx':
+  ensure => stopped,
+  enable => false,
+}
 
 # Ensure Apache package is installed
 package { 'apache2':
